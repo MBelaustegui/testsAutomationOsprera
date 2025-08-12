@@ -1,0 +1,24 @@
+# Java, Maven, Selenium, Cucumber
+/target/
+/.idea/
+*.iml
+*.class
+*.log
+*.tmp
+*.swp
+.DS_Store
+*.bak
+*.orig
+*.rej
+*.sublime-workspace
+*.sublime-project
+*.vscode/
+# Reportes y resultados
+/allure-results/
+/allure-report/
+/cucumber-report.html
+/cucumber-report.json
+/jsonReports/
+*.png
+# Archivos de sistema
+Thumbs.db
