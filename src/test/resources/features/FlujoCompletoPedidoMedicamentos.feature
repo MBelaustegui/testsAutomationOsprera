@@ -14,4 +14,10 @@ Feature: Flujo completo de pedido medicamentos
     And entro al modulo de SGP
     When busco el pedido generado
     And autorizo el pedido
+@audCentral
+  Scenario: Auditar un pedido
+    Given ingreso al sistema como auditor central
+    And entro al modulo de SGP para auditar
+    When busco el pedido 
+    And autorizo el pedido en sede central
 

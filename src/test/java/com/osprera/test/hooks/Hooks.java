@@ -40,6 +40,8 @@ public class Hooks {
             login("prueba_admdeleg", "test1234");
         } else if (scenario.getSourceTagNames().contains("@audDeleg")) {
             login("prueba_auddeleg", "test1234");
+        } else if (scenario.getSourceTagNames().contains("@audCentral")) {
+            login("prueba_audcentral", "test1234");
         }
         // Si usás steps para loguearte en @flujoPedidoCompleto, no hacemos nada más acá
     }

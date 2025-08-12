@@ -87,10 +87,10 @@ public class PedidoPage {
     }
 
     public void buscarYAgregarMedicamento() {
+        String medicamento = com.osprera.test.utils.Vars.get("medicamento.busqueda");
         WebElement monoInput = wait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//buscador-medicamentos-x-monodroga[@id='buscadorMonodrogas']/div/input[3]")));
-      //  monoInput.sendKeys("tolfen");
-        monoInput.sendKeys("ibup");
+        monoInput.sendKeys(medicamento);
         monoInput.sendKeys(Keys.ENTER);
 
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//tr[@id='tableBodyExamen']/td/span"))).click();
@@ -98,13 +98,10 @@ public class PedidoPage {
         wait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//buscador-medicamentos-x-monodroga[@id='buscadorMonodrogas']/div/input[4]"))).click();
 
-       // wait.until(ExpectedConditions.elementToBeClickable(
-         //       By.xpath("(//*[normalize-space(text()) and normalize-space(.)='tolfenámico,ác.'])[1]/following::td[2]"))).click();
-    
-        wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("(//*[normalize-space(text()) and normalize-space(.)='ibuprofeno'])[1]/following::td[2]"))).click();
-
-        }
+        // Selecciona el medicamento por nombre dinámicamente
+        String xpathMedicamento = String.format("(//*[normalize-space(text()) and contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'%s')])[1]/following::td[2]", medicamento.toLowerCase());
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(xpathMedicamento))).click();
+    }
 
     public void ingresarCantidadYDosis() {
         WebElement cantidadInput = wait.until(ExpectedConditions.elementToBeClickable(

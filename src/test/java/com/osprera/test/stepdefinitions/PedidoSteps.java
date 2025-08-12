@@ -53,7 +53,7 @@ public void envio_a_auditoria() {
 
 @Then("cierro el navegador")
 public void cierro_el_navegador() {
-    pedidoPage.cerrarNavegador();
+    // pedidoPage.cerrarNavegador(); // El cierre lo hace el hook After
 }
 
 
