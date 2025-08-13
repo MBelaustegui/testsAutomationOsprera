@@ -48,28 +48,30 @@ public class PedidoPage {
         fechaInput.sendKeys(Keys.TAB);
     }
 
-    public void cargarDiagnosticoYCIE() {
-        WebElement inputCie = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//buscador-cie/div/input")));
-        inputCie.sendKeys("G43");
-        driver.findElement(By.xpath("//buscador-cie/div/img")).click();
+   public void cargarDiagnosticoYCIE(String cieCodigo, String diagnosticoTexto) {
+    WebElement inputCie = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//buscador-cie/div/input")));
+    inputCie.clear();
+    inputCie.sendKeys(cieCodigo);
+    driver.findElement(By.xpath("//buscador-cie/div/img")).click();
 
-        WebElement agregarBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//buscador-cie/div/input[4]")));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", agregarBtn);
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", agregarBtn);
+    WebElement agregarBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//buscador-cie/div/input[4]")));
+    ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", agregarBtn);
+    ((JavascriptExecutor) driver).executeScript("arguments[0].click();", agregarBtn);
 
-        WebElement diagnosticoTextarea = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//textarea")));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", diagnosticoTextarea);
-        diagnosticoTextarea.clear();
-        diagnosticoTextarea.sendKeys("Dolor de cabeza");
-    }
+    WebElement diagnosticoTextarea = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//textarea")));
+    ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", diagnosticoTextarea);
+    diagnosticoTextarea.clear();
+    diagnosticoTextarea.sendKeys(diagnosticoTexto);
+}
 
-    public void seleccionarMedico() {
-        WebElement medicoInput = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//buscador-medico-solicitante/div/input[2]")));
-        medicoInput.click();
-        medicoInput.sendKeys("Garriga juan jose");
-        medicoInput.sendKeys(Keys.ENTER);
-    }
+    public void seleccionarMedico(String medicoBusqueda) {
+    WebElement medicoInput = wait.until(ExpectedConditions.elementToBeClickable(
+            By.xpath("//buscador-medico-solicitante/div/input[2]")));
+    medicoInput.click();
+    medicoInput.clear();
+    medicoInput.sendKeys(medicoBusqueda);
+    medicoInput.sendKeys(Keys.ENTER);
+}
    public void seleccionarUrgente() {
     WebElement urgenteCheckbox = wait.until(ExpectedConditions.elementToBeClickable(
         By.xpath("//input[@type='checkbox' and @ng-model='ngModel.Urgente.Valor']")));

@@ -24,30 +24,31 @@ public class Hooks {
     }
 
     // 2) ÚNICO setup que puede levantar driver (para ambos escenarios del flujo)
-    @Before(value = "@admDeleg or @audDeleg or @flujoPedidoCompleto", order = 10)
-    public void setUp(Scenario scenario) {
-        // Seguridad extra: si venimos “marcados”, no seguimos
-        assumeFalse("Se detiene el flujo porque falló un escenario anterior.", FailFast.shouldStop());
+   @Before(value = "@admDeleg or @admDelegProtesis or @audDeleg or @audCentral or @audCentralProtesis or @flujoPedidoCompleto or @flujoPedidoProtesis", order = 10)
+public void setUp(Scenario scenario) {
+    assumeFalse("Se detiene el flujo porque falló un escenario anterior.", FailFast.shouldStop());
 
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--start-maximized", "--disable-notifications", "--remote-allow-origins=*");
-        driver = new ChromeDriver(options);
-        wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-        driver.get("https://sioqa.osprera.org.ar/#/login");
+    ChromeOptions options = new ChromeOptions();
+    options.addArguments("--start-maximized", "--disable-notifications", "--remote-allow-origins=*");
+    driver = new ChromeDriver(options);
+    wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+    driver.get("https://sioqa.osprera.org.ar/#/login");
 
-        // Login automático por tag
-        if (scenario.getSourceTagNames().contains("@admDeleg")) {
-            login("prueba_admdeleg", "test1234");
-        } else if (scenario.getSourceTagNames().contains("@audDeleg")) {
-            login("prueba_auddeleg", "test1234");
-        } else if (scenario.getSourceTagNames().contains("@audCentral")) {
-            login("prueba_audcentral", "test1234");
-        }
-        // Si usás steps para loguearte en @flujoPedidoCompleto, no hacemos nada más acá
+    // Login automático por tag
+    if (scenario.getSourceTagNames().contains("@admDeleg") || 
+        scenario.getSourceTagNames().contains("@admDelegProtesis")) {
+        login("prueba_admdeleg", "test1234");
+    } else if (scenario.getSourceTagNames().contains("@audDeleg")) {
+        login("prueba_auddeleg", "test1234");
+    } else if (scenario.getSourceTagNames().contains("@audCentral")) {
+        login("prueba_audcentral", "test1234");
+    } else if (scenario.getSourceTagNames().contains("@audCentralProtesis")) {
+        login("prueba_protCentral", "test1234");
     }
+}
 
     private void login(String usuario, String clave) {
-        driver.get("https://sioqa.osprera.org.ar/#/login");
+        driver.get("https://siodev.osprera.org.ar/#/login");
 
         WebElement user = wait.until(ExpectedConditions.visibilityOfElementLocated(
             By.xpath("//input[@placeholder='Usuario']")));

@@ -14,6 +14,7 @@ public class PedidoSteps {
     private WebDriver driver = Hooks.driver;
     private PedidoPage pedidoPage = new PedidoPage(driver);
     private String numeroOrden;  
+    
     @Given("que ya inicié sesión correctamente")
     public void que_ya_inicié_sesion_correctamente() {
         pedidoPage.esperarSGPVisible();
@@ -30,17 +31,24 @@ public class PedidoSteps {
         pedidoPage.completarDatosGenerales(dni);
     }
 
-   @When("completo el pedido de medicamentos")
-public void completo_el_pedido_de_medicamentos() {
-    pedidoPage.seleccionarTipoPedidoYFecha();
-    pedidoPage.cargarDiagnosticoYCIE();
-    pedidoPage.seleccionarMedico();
-    pedidoPage.seleccionarUrgente(); 
-    pedidoPage.seleccionarFarmacia();
-    pedidoPage.buscarYAgregarMedicamento();
-    pedidoPage.ingresarCantidadYDosis();
-    pedidoPage.clickCargarAdjuntos();
-}
+  @When("completo el pedido de medicamentos")
+    public void completo_el_pedido_de_medicamentos() {
+        pedidoPage.seleccionarTipoPedidoYFecha();
+
+        // Ahora pasamos los valores como parámetros
+        String cieCodigo = Vars.get("cie.codigo");
+        String diagnosticoTexto = Vars.get("diagnostico.texto");
+        pedidoPage.cargarDiagnosticoYCIE(cieCodigo, diagnosticoTexto);
+
+        String medicoBusqueda = Vars.get("medico.busqueda");
+        pedidoPage.seleccionarMedico(medicoBusqueda);
+
+        pedidoPage.seleccionarUrgente(); 
+        pedidoPage.seleccionarFarmacia();
+        pedidoPage.buscarYAgregarMedicamento();
+        pedidoPage.ingresarCantidadYDosis();
+        pedidoPage.clickCargarAdjuntos();
+    }
 
 
 @And("envio a auditoria")

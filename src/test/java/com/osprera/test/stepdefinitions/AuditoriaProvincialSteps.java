@@ -37,8 +37,7 @@ public void ingreso_como_auditor() {
     @And("autorizo el pedido")
     public void autorizo_pedido() {
         auditoriaPage.hacerClickEnAutorizar();
-        // El método hacerClickEnAutorizar() ya verifica y cierra el popup
-        // No cerrar navegador aquí, lo hace el hook After
+       
     }
 
    
