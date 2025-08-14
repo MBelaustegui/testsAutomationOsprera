@@ -48,7 +48,7 @@ public void setUp(Scenario scenario) {
 }
 
     private void login(String usuario, String clave) {
-        driver.get("https://siodev.osprera.org.ar/#/login");
+        driver.get("https://sioqa.osprera.org.ar/#/login");
 
         WebElement user = wait.until(ExpectedConditions.visibilityOfElementLocated(
             By.xpath("//input[@placeholder='Usuario']")));

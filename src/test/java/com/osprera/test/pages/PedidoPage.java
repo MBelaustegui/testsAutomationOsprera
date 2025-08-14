@@ -100,7 +100,7 @@ public class PedidoPage {
         wait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//buscador-medicamentos-x-monodroga[@id='buscadorMonodrogas']/div/input[4]"))).click();
 
-        // Selecciona el medicamento por nombre dinámicamente
+   
         String xpathMedicamento = String.format("(//*[normalize-space(text()) and contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'%s')])[1]/following::td[2]", medicamento.toLowerCase());
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath(xpathMedicamento))).click();
     }

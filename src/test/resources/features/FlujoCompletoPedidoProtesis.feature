@@ -6,8 +6,7 @@ Feature: Flujo completo de pedido protesis
     And entro a SGP
     And ingreso el DNI del beneficiario
     When completo el pedido de protesis
-    And confirmo el pedido
-    Then cierro el navegador
+    Then envio a auditoria provincial
 @audDeleg
   Scenario: Auditar un pedido
     Given ingreso al sistema como auditor
