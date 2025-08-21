@@ -18,7 +18,7 @@ import io.cucumber.junit.CucumberOptions;
     "json:target/cucumber-report.json",
 },
     monochrome = true,
-    tags = "@admDelegProtesis" 
+    tags = "@admDelegLentes" 
 )
 public class RunFlujoPedidoCompletoTest {
 }

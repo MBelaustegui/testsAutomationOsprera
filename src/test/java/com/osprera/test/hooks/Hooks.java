@@ -24,7 +24,7 @@ public class Hooks {
     }
 
     // 2) ÚNICO setup que puede levantar driver (para ambos escenarios del flujo)
-   @Before(value = "@admDeleg or @admDelegProtesis or @audDeleg or @audCentral or @audCentralProtesis or @flujoPedidoCompleto or @flujoPedidoProtesis", order = 10)
+   @Before(value = "@admDeleg or @admDelegProtesis or @audDeleg or @audCentral or @admDelegLentes or @audCentralProtesis or @flujoPedidoCompleto or @flujoPedidoProtesis", order = 10)
 public void setUp(Scenario scenario) {
     assumeFalse("Se detiene el flujo porque falló un escenario anterior.", FailFast.shouldStop());
 
@@ -36,7 +36,8 @@ public void setUp(Scenario scenario) {
 
     // Login automático por tag
     if (scenario.getSourceTagNames().contains("@admDeleg") || 
-        scenario.getSourceTagNames().contains("@admDelegProtesis")) {
+        scenario.getSourceTagNames().contains("@admDelegProtesis") || 
+        scenario.getSourceTagNames().contains("@admDelegLentes")) {
         login("prueba_admdeleg", "test1234");
     } else if (scenario.getSourceTagNames().contains("@audDeleg")) {
         login("prueba_auddeleg", "test1234");

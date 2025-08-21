@@ -69,7 +69,8 @@ public class PedidoProtesisSteps {
         int cantidad = Integer.parseInt(Vars.get("protesis.cantidad"));
         pedidoProtesisPage.completarDatosProtesis(cantidad);
 
-        // 3.8) Adjuntos específicos de Prótesis (Historia Clínica + Exámenes Compl. + Pedido médico + Tipo Estudio)
+        // 3.8) Adjuntos específicos de Prótesis (Historia Clínica + Exámenes Compl. +
+        // Pedido médico + Tipo Estudio)
         String fechaAdjunto = Vars.get("protesis.fechaAdjunto");
         String comentarioAdj = Vars.get("protesis.comentario") != null
                 ? Vars.get("protesis.comentario")
@@ -78,14 +79,15 @@ public class PedidoProtesisSteps {
         String tipoEstudio = Vars.get("protesis.tipoEstudio"); // Ej.: "Radiología"
         pedidoProtesisPage.clickCargarAdjuntosProtesis(fechaAdjunto, comentarioAdj, rutaArchivo, tipoEstudio);
 
-       
     }
 
-    // 4) Enviar a auditoría (y capturar SIEMPRE el número visible en la pantalla de resultados)
-  @Then("envio a auditoria provincial")
-public void envio_a_auditoria() {
-    pedidoProtesisPage.enviarAAuditoria();     // ✅ directo a Enviar a Auditoría
-    String numeroOrden = pedidoPage.obtenerNumeroOrden();  // ahora sí hay N°
-    ContextoGlobal.numeroOrden = numeroOrden;
-    System.out.println("📦 Número de orden visual: " + numeroOrden);
-}}
+    // 4) Enviar a auditoría (y capturar SIEMPRE el número visible en la pantalla de
+    // resultados)
+    @Then("envio a auditoria provincial")
+    public void envio_a_auditoria() {
+        pedidoProtesisPage.enviarAAuditoria();
+        String numeroOrden = pedidoPage.obtenerNumeroOrden();
+        ContextoGlobal.numeroOrden = numeroOrden;
+        System.out.println("📦 Número de orden visual: " + numeroOrden);
+    }
+}
