@@ -32,13 +32,13 @@ public void setUp(Scenario scenario) {
     options.addArguments("--start-maximized", "--disable-notifications", "--remote-allow-origins=*");
     driver = new ChromeDriver(options);
     wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-    driver.get("https://sioqa.osprera.org.ar/#/login");
+    driver.get("https://sio.osprera.org.ar/#/login");
 
     // Login automático por tag
     if (scenario.getSourceTagNames().contains("@admDeleg") || 
         scenario.getSourceTagNames().contains("@admDelegProtesis") || 
         scenario.getSourceTagNames().contains("@admDelegLentes")) {
-        login("prueba_admdeleg", "test1234");
+        login("ChoqueFA", "Inicio20");
     } else if (scenario.getSourceTagNames().contains("@audDeleg")) {
         login("prueba_auddeleg", "test1234");
     } else if (scenario.getSourceTagNames().contains("@audCentral")) {
@@ -49,7 +49,7 @@ public void setUp(Scenario scenario) {
 }
 
     private void login(String usuario, String clave) {
-        driver.get("https://sioqa.osprera.org.ar/#/login");
+        driver.get("https://sio.osprera.org.ar/#/login");
 
         WebElement user = wait.until(ExpectedConditions.visibilityOfElementLocated(
             By.xpath("//input[@placeholder='Usuario']")));
@@ -62,7 +62,7 @@ public void setUp(Scenario scenario) {
         pass.sendKeys(clave);
 
         wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button.dropdown-toggle"))).click();
-        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Externo')]"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'OSPRERA')]"))).click();
 
         WebElement loginButton = wait.until(ExpectedConditions.elementToBeClickable(
             By.xpath("//button[contains(text(),'Iniciar Sesión')]")));

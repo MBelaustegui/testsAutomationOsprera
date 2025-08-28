@@ -31,7 +31,7 @@ public class AuditoriaProvincialPage {
 
     // ====== Login (si lo usás desde acá) ======
     public void loginComoAuditor(String usuario, String clave) {
-        driver.get("https://sioqa.osprera.org.ar/#/login");
+        driver.get("https://sio.osprera.org.ar/#/login");
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@placeholder='Usuario']")))
             .sendKeys(usuario);

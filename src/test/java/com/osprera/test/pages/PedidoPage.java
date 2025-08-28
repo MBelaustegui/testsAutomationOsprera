@@ -54,9 +54,9 @@ public class PedidoPage {
     inputCie.sendKeys(cieCodigo);
     driver.findElement(By.xpath("//buscador-cie/div/img")).click();
 
-    WebElement agregarBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//buscador-cie/div/input[4]")));
-    ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", agregarBtn);
-    ((JavascriptExecutor) driver).executeScript("arguments[0].click();", agregarBtn);
+   // WebElement agregarBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//buscador-cie/div/input[4]")));
+   // ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", agregarBtn);
+   // ((JavascriptExecutor) driver).executeScript("arguments[0].click();", agregarBtn);
 
     WebElement diagnosticoTextarea = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//textarea")));
     ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", diagnosticoTextarea);
@@ -119,8 +119,8 @@ public class PedidoPage {
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//simpleselect[@id='idComboDosisPeriodo']/div/ul/li[4]/label/span"))).click();
 
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@value='SurNo']"))).click();
-     //   wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//simpleselect[@id='idComboACargoDe']/div/button/div/span"))).click();
-       // wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//simpleselect[@id='idComboACargoDe']/div/ul/li[3]/label/span"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//simpleselect[@id='idComboACargoDe']/div/button/div/span"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//simpleselect[@id='idComboACargoDe']/div/ul/li[3]/label/span"))).click();
     }
 
     public void clickCargarAdjuntos() {
