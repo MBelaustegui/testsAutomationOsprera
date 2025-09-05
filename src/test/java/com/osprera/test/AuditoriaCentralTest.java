@@ -148,6 +148,13 @@ public class AuditoriaCentralTest {
         
         pedidoPage.clickSGP();
         
+        // Solo en producción, hacer click en la pestaña "Pendientes"
+        String ambiente = com.osprera.test.utils.EnvironmentManager.getCurrentEnvironment();
+        if ("produccion".equals(ambiente)) {
+            Allure.step("Haciendo click en pestaña 'Pendientes' (solo en producción)");
+            pedidoPage.clickPestanaPendientes();
+        }
+        
         Allure.step("Módulo SGP accedido correctamente");
     }
     

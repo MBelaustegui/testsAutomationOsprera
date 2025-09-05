@@ -272,6 +272,20 @@ public class PedidoPage {
         cerrar.click();
     }
 
+    public void clickPestanaPendientes() {
+        // Este método hace click en la pestaña "Pendientes" después de ingresar al módulo SGP
+        // Solo se usa en producción
+        try {
+            WebElement pestanaPendientes = wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//li//a[@href='#/solicitudes/auditoria/consultas']//span[text()='Pendientes']")));
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", pestanaPendientes);
+            System.out.println("✅ Click realizado en pestaña 'Pendientes'");
+        } catch (Exception e) {
+            System.out.println("⚠️ No se pudo hacer click en pestaña 'Pendientes': " + e.getMessage());
+            // No lanzar excepción para que el test continúe
+        }
+    }
+
     public void cerrarNavegador() {
         driver.quit();
     }
