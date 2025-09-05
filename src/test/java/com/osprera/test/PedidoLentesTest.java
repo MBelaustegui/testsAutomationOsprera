@@ -2,6 +2,7 @@ package com.osprera.test;
 
 import com.osprera.test.pages.PedidoLentesPage;
 import com.osprera.test.pages.PedidoPage;
+import com.osprera.test.utils.EnvironmentManager;
 import com.osprera.test.utils.Vars;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import io.qameta.allure.*;
@@ -41,14 +42,21 @@ public class PedidoLentesTest {
         pedidoLentesPage = new PedidoLentesPage(driver);
         pedidoPage = new PedidoPage(driver);
         
-        // Navegar a la aplicación
-        driver.get("https://sio.osprera.org.ar/#/login");
+        // Navegar a la aplicación usando EnvironmentManager
+        String url = EnvironmentManager.getCurrentUrl();
+        driver.get(url);
     }
     
     @AfterAll
     static void tearDown() {
-        if (driver != null) {
-            driver.quit();
+        try {
+            if (driver != null) {
+                Allure.step("🔚 Cerrando navegador al finalizar suite de pedido de lentes");
+                driver.quit();
+                Allure.step("✅ Navegador cerrado exitosamente");
+            }
+        } catch (Exception e) {
+            Allure.step("⚠️ Error al cerrar navegador en tearDown: " + e.getMessage());
         }
     }
     
@@ -78,14 +86,58 @@ public class PedidoLentesTest {
             enviarAAuditoria();
             
         } catch (Exception e) {
-            // Capturar screenshot en caso de error
+            // Manejo detallado de errores con captura de pantalla
+            String errorMessage = "❌ FALLO EN PEDIDO DE LENTES: " + e.getMessage();
+            Allure.step(errorMessage);
+            
+            // Capturar screenshot del error
             try {
                 byte[] screenshot = ((org.openqa.selenium.TakesScreenshot) driver).getScreenshotAs(org.openqa.selenium.OutputType.BYTES);
-                Allure.addAttachment("Error Screenshot", "image/png", new String(screenshot));
+                io.qameta.allure.Allure.getLifecycle().addAttachment("❌ ERROR - Pedido de Lentes Falló", "image/png", "png", screenshot);
+                
+                // Agregar información detallada del error
+                String errorDetails = String.format(
+                    "🚨 DETALLES DEL ERROR:\n" +
+                    "=====================================\n" +
+                    "❌ Test: Pedido de Lentes\n" +
+                    "⏰ Timestamp: %s\n" +
+                    "🌍 Ambiente: %s\n" +
+                    "👤 Usuario: %s\n" +
+                    "🔗 URL: %s\n" +
+                    "💥 Error: %s\n" +
+                    "📍 Stack Trace: %s\n" +
+                    "=====================================\n" +
+                    "🛑 EJECUCIÓN DETENIDA - Revisar logs y screenshot",
+                    java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")),
+                    EnvironmentManager.getCurrentEnvironment(),
+                    EnvironmentManager.getUsuarioPedidos(),
+                    driver.getCurrentUrl(),
+                    e.getMessage(),
+                    e.getClass().getSimpleName()
+                );
+                
+                Allure.addAttachment("Error Details", "text/plain", errorDetails);
+                
             } catch (Exception screenshotException) {
-                Allure.addAttachment("Error Screenshot", "text/plain", "No se pudo capturar screenshot: " + screenshotException.getMessage());
+                Allure.addAttachment("❌ Error Screenshot", "text/plain", 
+                    "No se pudo capturar screenshot: " + screenshotException.getMessage());
             }
-            throw e;
+            
+            // Cerrar el navegador antes de fallar
+            try {
+                if (driver != null) {
+                    driver.quit();
+                    Allure.step("🔚 Navegador cerrado después del error");
+                }
+            } catch (Exception closeException) {
+                Allure.step("⚠️ Error al cerrar navegador: " + closeException.getMessage());
+            }
+            
+            // Marcar el test como fallido con mensaje claro
+            Assertions.fail("🚨 PEDIDO DE LENTES FALLÓ: " + e.getMessage() + 
+                          "\n📸 Revisar screenshot adjunto para más detalles" +
+                          "\n🛑 Ejecución detenida para investigación" +
+                          "\n🔚 Navegador cerrado automáticamente");
         }
     }
     
@@ -93,10 +145,59 @@ public class PedidoLentesTest {
     private void iniciarSesion() {
         Allure.step("Iniciando sesión en la aplicación");
         
-        // Aquí iría tu lógica de login
-        // Implementar según tu aplicación
-        
-        Allure.step("Sesión iniciada exitosamente");
+        try {
+            // Esperar a que la página esté completamente cargada
+            org.openqa.selenium.support.ui.WebDriverWait wait = new org.openqa.selenium.support.ui.WebDriverWait(driver, Duration.ofSeconds(10));
+            
+            // Completar formulario de login con esperas explícitas
+            org.openqa.selenium.WebElement usuarioInput = wait.until(
+                org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable(
+                    org.openqa.selenium.By.xpath("//input[@placeholder='Usuario']")
+                )
+            );
+            usuarioInput.clear();
+            usuarioInput.sendKeys(EnvironmentManager.getUsuarioPedidos());
+            
+            org.openqa.selenium.WebElement passwordInput = wait.until(
+                org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable(
+                    org.openqa.selenium.By.xpath("//input[@type='password']")
+                )
+            );
+            passwordInput.clear();
+            passwordInput.sendKeys(EnvironmentManager.getCurrentPassword());
+            
+            // Seleccionar tipo de usuario
+            String tipoUsuario = EnvironmentManager.getCurrentTipoUsuario();
+            
+            // Hacer click en el dropdown usando JavaScript para evitar problemas
+            org.openqa.selenium.WebElement dropdownToggle = driver.findElement(
+                org.openqa.selenium.By.cssSelector("button.dropdown-toggle"));
+            ((org.openqa.selenium.JavascriptExecutor) driver).executeScript("arguments[0].click();", dropdownToggle);
+
+            // Esperar que aparezcan las opciones y hacer click usando JavaScript
+            org.openqa.selenium.WebElement opcionUsuario = driver.findElement(
+                org.openqa.selenium.By.xpath("//span[contains(text(),'" + tipoUsuario + "')]"));
+            ((org.openqa.selenium.JavascriptExecutor) driver).executeScript("arguments[0].click();", opcionUsuario);
+
+            // Hacer click en login
+            org.openqa.selenium.WebElement loginButton = driver.findElement(
+                org.openqa.selenium.By.xpath("//button[contains(text(),'Iniciar Sesión')]"));
+            loginButton.click();
+
+            // Esperar que se complete el login usando la misma variable wait
+            try {
+                wait.until(org.openqa.selenium.support.ui.ExpectedConditions.urlContains("dashboard"));
+            } catch (Exception e) {
+                wait.until(org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated(
+                    org.openqa.selenium.By.cssSelector("body:not(.loading)")));
+            }
+            
+            Allure.step("Sesión iniciada exitosamente con usuario: " + EnvironmentManager.getUsuarioPedidos());
+            
+        } catch (Exception e) {
+            Allure.step("Error al iniciar sesión: " + e.getMessage());
+            throw new RuntimeException("Error al iniciar sesión", e);
+        }
     }
     
     @Step("Entrar al módulo SGP")
@@ -112,28 +213,90 @@ public class PedidoLentesTest {
     private void crearNuevoPedidoLentes() {
         Allure.step("Creando nuevo pedido de lentes");
         
-        // Implementar lógica de creación de pedido
-        // pedidoLentesPage.crearNuevoPedido();
+        try {
+            // Seleccionar tipo de pedido y fecha
+            pedidoLentesPage.seleccionarTipoPedidoYFecha();
+            Allure.step("Tipo de pedido 'Lentes' seleccionado y fecha configurada");
+            
+            // Cargar datos del beneficiario, diagnóstico y médico
+            pedidoPage.cargarDiagnosticoYCIE(Vars.get("cie.codigo"), Vars.get("diagnostico.texto"));
+            pedidoPage.seleccionarMedico(Vars.get("medico.busqueda"));
+            Allure.step("Datos del beneficiario, diagnóstico y médico cargados");
+            
+        } catch (Exception e) {
+            Allure.step("Error al crear nuevo pedido de lentes: " + e.getMessage());
+            throw new RuntimeException("Error al crear nuevo pedido de lentes", e);
+        }
         
-        Allure.step("Nuevo pedido de lentes creado");
+        Allure.step("Nuevo pedido de lentes creado exitosamente");
     }
     
     @Step("Completar datos del pedido")
     private void completarDatosPedido() {
         Allure.step("Completando datos del pedido de lentes");
         
-        // Implementar lógica de completado de datos
-        // pedidoLentesPage.completarDatos();
+        try {
+            // Obtener datos de configuración
+            String nombreLentes = Vars.get("lentes.nombre");
+            String descripcionLentes = Vars.get("lentes.descripcion");
+            int cantidadLentes = Integer.parseInt(Vars.get("lentes.cantidad"));
+            String delegacionLentes = Vars.get("lentes.delegacion");
+            
+            Allure.step("Datos de configuración cargados: " + nombreLentes + ", cantidad: " + cantidadLentes);
+            
+            // Seleccionar delegación de entrega
+            pedidoLentesPage.DelegacionEntrega(delegacionLentes);
+            Allure.step("Delegación de entrega seleccionada: " + delegacionLentes);
+            
+            // Buscar y agregar lentes
+            pedidoLentesPage.buscarYAgregarLentes(nombreLentes);
+            Allure.step("Lentes agregados: " + nombreLentes);
+            
+            // Agregar descripción
+            pedidoLentesPage.agregarDescripcionLentes(descripcionLentes);
+            Allure.step("Descripción agregada: " + descripcionLentes);
+            
+            // Completar datos (cantidad, No, A cargo de Osprera)
+            pedidoLentesPage.completarDatosLentes(cantidadLentes);
+            Allure.step("Datos completados: cantidad=" + cantidadLentes + ", A cargo de Osprera");
+            
+            // Confirmar y obtener número de pedido
+            String numeroPedido = pedidoLentesPage.confirmarYObtenerNumero();
+            if (!numeroPedido.isEmpty()) {
+                Allure.step("Pedido confirmado exitosamente. Número de pedido: " + numeroPedido);
+                // Guardar número de pedido para auditoría
+                com.osprera.test.utils.ContextoGlobal.numeroOrden = numeroPedido;
+            } else {
+                Allure.step("Pedido confirmado pero no se pudo obtener el número");
+            }
+            
+        } catch (Exception e) {
+            Allure.step("Error al completar datos del pedido: " + e.getMessage());
+            throw new RuntimeException("Error al completar datos del pedido", e);
+        }
         
-        Allure.step("Datos del pedido completados");
+        Allure.step("Datos del pedido completados exitosamente");
     }
     
     @Step("Enviar pedido a auditoría")
     private void enviarAAuditoria() {
         Allure.step("Enviando pedido a auditoría");
         
-        pedidoPage.enviarAAuditoria();
-        
-        Allure.step("Pedido enviado a auditoría exitosamente");
+        try {
+            pedidoLentesPage.enviarAAuditoria();
+            Allure.step("Pedido enviado a auditoría exitosamente");
+            
+            // Capturar screenshot final
+            try {
+                byte[] screenshot = ((org.openqa.selenium.TakesScreenshot) driver).getScreenshotAs(org.openqa.selenium.OutputType.BYTES);
+                io.qameta.allure.Allure.getLifecycle().addAttachment("✅ PEDIDO DE LENTES COMPLETADO", "image/png", "png", screenshot);
+            } catch (Exception e) {
+                Allure.step("⚠️ No se pudo capturar screenshot final: " + e.getMessage());
+            }
+            
+        } catch (Exception e) {
+            Allure.step("Error al enviar pedido a auditoría: " + e.getMessage());
+            throw new RuntimeException("Error al enviar pedido a auditoría", e);
+        }
     }
 }
