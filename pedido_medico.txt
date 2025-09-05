@@ -1,0 +1,19 @@
+PEDIDO MÉDICO AUTOMATIZADO
+==========================
+
+Fecha: 04/09/2025
+Paciente: Beneficiario de prueba
+DNI: 12345678
+Médico: Dr. Automatización
+Especialidad: Medicina General
+
+MEDICAMENTO SOLICITADO:
+- Paracetamol 500mg
+- Cantidad: 5 unidades
+- Dosis: 1 comprimido cada 8 horas
+
+OBSERVACIONES:
+Este pedido fue generado automáticamente por el sistema de testing Selenium.
+Es parte de las pruebas de automatización del sistema SGP.
+
+Firma digital: Sistema de Testing Automatizado

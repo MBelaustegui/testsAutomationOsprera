@@ -88,39 +88,126 @@ public class PedidoPage {
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//tr[@id='tableBodyExamen']/td/span"))).click();
     }
 
-    public void buscarYAgregarMedicamento() {
-        String medicamento = com.osprera.test.utils.Vars.get("medicamento.busqueda");
+    public void buscarYAgregarMedicamento(String medicamentoNombre) {
+        // Limpiar el campo de búsqueda
         WebElement monoInput = wait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//buscador-medicamentos-x-monodroga[@id='buscadorMonodrogas']/div/input[3]")));
-        monoInput.sendKeys(medicamento);
+        monoInput.clear();
+        monoInput.sendKeys(medicamentoNombre);
         monoInput.sendKeys(Keys.ENTER);
 
-        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//tr[@id='tableBodyExamen']/td/span"))).click();
+        // Esperar y hacer clic en el medicamento encontrado
+        WebElement spanMedicamento = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//tr[@id='tableBodyExamen']/td/span")));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", spanMedicamento);
 
-        wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//buscador-medicamentos-x-monodroga[@id='buscadorMonodrogas']/div/input[4]"))).click();
+        // Hacer clic en el botón Agregar
+        WebElement botonAgregar = wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//buscador-medicamentos-x-monodroga[@id='buscadorMonodrogas']/div/input[4]")));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", botonAgregar);
 
-   
-        String xpathMedicamento = String.format("(//*[normalize-space(text()) and contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'%s')])[1]/following::td[2]", medicamento.toLowerCase());
-        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(xpathMedicamento))).click();
+        // Hacer clic en el medicamento seleccionado para agregarlo a la tabla
+        String xpathMedicamento = String.format("(//*[normalize-space(text()) and contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'%s')])[1]/following::td[2]", medicamentoNombre.toLowerCase());
+        WebElement medicamentoSeleccionado = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(xpathMedicamento)));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", medicamentoSeleccionado);
     }
 
-    public void ingresarCantidadYDosis() {
+    public void ingresarDetallesMedicamento(String medicamentoNombre, String cantidad, String dosis, String tipoDosis, String sur) {
+        // Esperar un momento para que el medicamento se agregue a la tabla
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        
+        // Solo para el primer medicamento (ibu)
+        // Ingresar cantidad
         WebElement cantidadInput = wait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//div[2]/table/tbody/tr/td[6]/input")));
-        cantidadInput.clear();
-        cantidadInput.sendKeys("5");
+        ((JavascriptExecutor) driver).executeScript("arguments[0].value = '';", cantidadInput);
+        cantidadInput.sendKeys(cantidad);
 
-        WebElement dosisInput = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//td[7]/input")));
-        dosisInput.clear();
-        dosisInput.sendKeys("1");
+        // Ingresar dosis
+        WebElement dosisInput = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[2]/table/tbody/tr/td[7]/input")));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].value = '';", dosisInput);
+        dosisInput.sendKeys(dosis);
 
+        // Seleccionar tipo de dosis
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//simpleselect[@id='idComboDosisPeriodo']/div/button/div/span"))).click();
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//simpleselect[@id='idComboDosisPeriodo']/div/ul/li[4]/label/span"))).click();
 
+        // Seleccionar SUR
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@value='SurNo']"))).click();
-        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//simpleselect[@id='idComboACargoDe']/div/button/div/span"))).click();
-        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//simpleselect[@id='idComboACargoDe']/div/ul/li[3]/label/span"))).click();
+        
+        // NUEVO PASO: Seleccionar "Osprera" después de la selección SUR
+        seleccionarOspreraDespuesDeSUR();
+    }
+
+    public void seleccionarACargoDeOSPRERA() {
+        String ambiente = com.osprera.test.utils.EnvironmentManager.getCurrentEnvironment();
+        if ("produccion".equals(ambiente)) {
+            // Hacer click en el botón del dropdown "A cargo de" - usar el botón directamente
+            wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//simpleselect[@id='idComboACargoDe']//button[@ng-click='toggleSelect()']"))).click();
+            
+            // Seleccionar "Osprera" (segunda opción en el dropdown)
+            wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//simpleselect[@id='idComboACargoDe']//label[@class='sip-multiselect-opciones']//span[text()='Osprera']"))).click();
+        }
+    }
+
+    public void seleccionarOspreraDespuesDeSUR() {
+        try {
+            System.out.println("🔍 Buscando dropdown después de selección SUR...");
+            Thread.sleep(2000);
+            
+            // Buscar todos los botones con toggleSelect para debug
+            var botones = driver.findElements(By.xpath("//button[@ng-click='toggleSelect()']"));
+            System.out.println("📊 Encontrados " + botones.size() + " botones con toggleSelect");
+            
+            // Analizar cada botón para encontrar el correcto
+            for (int i = 0; i < botones.size(); i++) {
+                try {
+                    WebElement boton = botones.get(i);
+                    String texto = boton.getText();
+                    String clases = boton.getAttribute("class");
+                    String estilo = boton.getAttribute("style");
+                    boolean visible = boton.isDisplayed();
+                    boolean habilitado = boton.isEnabled();
+                    
+                    System.out.println("🔍 Botón " + (i+1) + ":");
+                    System.out.println("   Texto: '" + texto + "'");
+                    System.out.println("   Clases: " + clases);
+                    System.out.println("   Estilo: " + estilo);
+                    System.out.println("   Visible: " + visible + ", Habilitado: " + habilitado);
+                    
+                    // Buscar el botón que tenga "Seleccione..." en el texto
+                    if (texto.contains("Seleccione") && visible && habilitado) {
+                        System.out.println("✅ ¡Encontrado! Botón con 'Seleccione...'");
+                        boton.click();
+                        System.out.println("✅ Click realizado en dropdown");
+                        
+                        Thread.sleep(1500);
+                        
+                        // Buscar "Osprera"
+                        var opciones = driver.findElements(By.xpath("//span[text()='Osprera']"));
+                        System.out.println("📊 Encontradas " + opciones.size() + " opciones con texto 'Osprera'");
+                        
+                        if (!opciones.isEmpty()) {
+                            opciones.get(0).click();
+                            System.out.println("✅ Osprera seleccionado exitosamente");
+                            return;
+                        } else {
+                            System.out.println("⚠️ No se encontró la opción 'Osprera'");
+                        }
+                    }
+                } catch (Exception e) {
+                    System.out.println("❌ Error analizando botón " + (i+1) + ": " + e.getMessage());
+                }
+            }
+            
+            System.out.println("⚠️ No se encontró ningún botón con 'Seleccione...'");
+            
+        } catch (Exception e) {
+            System.out.println("⚠️ Error en seleccionarOspreraDespuesDeSUR: " + e.getMessage());
+        }
     }
 
     public void clickCargarAdjuntos() {
@@ -152,7 +239,7 @@ public class PedidoPage {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        RobotUtils.subirArchivo("C:\\Users\\BeeUser\\Documents\\pedido_medico.txt");
+        RobotUtils.subirArchivo("pedido_medico.txt");
 
         WebElement aceptarBtn = wait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//div[@id='modaladjuntos']//button[2]")));
@@ -162,7 +249,9 @@ public class PedidoPage {
     public void enviarAAuditoria() {
         WebElement botonEnviar = wait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//button[contains(text(),'Enviar a Auditoría')]")));
-        botonEnviar.click();
+        
+        // Usar JavaScript click para evitar intercepts del modal backdrop
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", botonEnviar);
     }
 
      public boolean apareceConfirmacion() {

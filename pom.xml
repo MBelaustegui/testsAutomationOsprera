@@ -5,14 +5,15 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.osprera.test</groupId>
-  <artifactId>selenium-cucumber</artifactId>
+  <artifactId>selenium-allure</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <name>Selenium Cucumber Demo</name>
+  <name>Selenium Allure Demo</name>
 
   <properties>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
-
+    <allure.version>2.24.0</allure.version>
+    <aspectj.version>1.9.19</aspectj.version>
   </properties>
 
   <dependencies>
@@ -30,42 +31,86 @@
       <version>20240303</version>
     </dependency>
 
-    <!-- Cucumber -->
+    <!-- JUnit 5 -->
     <dependency>
-      <groupId>io.cucumber</groupId>
-      <artifactId>cucumber-java</artifactId>
-      <version>7.14.0</version>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>5.10.0</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>io.cucumber</groupId>
-      <artifactId>cucumber-junit</artifactId>
-      <version>7.14.0</version>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>5.10.0</version>
       <scope>test</scope>
     </dependency>
 
-    <!-- JUnit -->
+    <!-- Allure JUnit 5 -->
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.13.2</version>
+      <groupId>io.qameta.allure</groupId>
+      <artifactId>allure-junit5</artifactId>
+      <version>${allure.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- WebDriverManager para manejo automático de drivers -->
+    <dependency>
+      <groupId>io.github.bonigarcia</groupId>
+      <artifactId>webdrivermanager</artifactId>
+      <version>5.6.2</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
 
   <build>
     <plugins>
-      <!-- Ejecuta los tests -->
+      <!-- Compilador Java -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.0.0</version>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.11.0</version>
         <configuration>
-          <includes>
-            <include>**/TestRunner.java</include>
-          </includes>
+          <source>17</source>
+          <target>17</target>
         </configuration>
       </plugin>
 
+      <!-- Surefire Plugin para ejecutar tests -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.1.2</version>
+        <configuration>
+          <argLine>
+            -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
+          </argLine>
+          <systemProperties>
+            <property>
+              <name>allure.results.directory</name>
+              <value>${project.build.directory}/allure-results</value>
+            </property>
+          </systemProperties>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>${aspectj.version}</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+
+      <!-- Allure Maven Plugin -->
+      <plugin>
+        <groupId>io.qameta.allure</groupId>
+        <artifactId>allure-maven</artifactId>
+        <version>2.12.0</version>
+        <configuration>
+          <reportVersion>${allure.version}</reportVersion>
+          <resultsDirectory>${project.build.directory}/allure-results</resultsDirectory>
+          <reportDirectory>${project.build.directory}/allure-report</reportDirectory>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>

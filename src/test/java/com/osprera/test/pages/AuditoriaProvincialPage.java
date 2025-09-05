@@ -109,7 +109,7 @@ public class AuditoriaProvincialPage {
                 By.xpath("(//*[normalize-space(text())='Cancelar']/following::button[1])[1]")));
         botonConfirmar.click();
 
-        // Esperar popup “Resultados” y loguear estado
+        // Esperar popup "Resultados" y loguear estado
         String estado = leerEstadoResultados();
         System.out.println("📘 Estado leído en popup: " + estado);
 
@@ -138,26 +138,20 @@ public class AuditoriaProvincialPage {
         if (!autorizado) {
             throw new AssertionError("❌ El pedido no fue autorizado (no se encontró la palabra AUTORIZADO en el popup).");
         }
-        // Captura adicional antes de cerrar popup/navegador y adjuntar al reporte si Scenario está disponible
+        // Captura adicional antes de cerrar popup/navegador
         try {
             File src = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
             File dst = new File("evidencia_autorizacion_final.png");
             Files.copy(src.toPath(), dst.toPath(), StandardCopyOption.REPLACE_EXISTING);
             System.out.println("📸 Captura FINAL guardada en: " + dst.getAbsolutePath());
-            // Adjuntar al reporte si Scenario está disponible
-            Object maybeScenario = driver.manage().getCookieNamed("scenarioRef"); // hack: no hay acceso directo
-            if (maybeScenario instanceof io.cucumber.java.Scenario) {
-                io.cucumber.java.Scenario scenario = (io.cucumber.java.Scenario) maybeScenario;
-                scenario.attach(Files.readAllBytes(dst.toPath()), "image/png", "📸 Captura final validación");
-            }
         } catch (IOException ex) {
             System.err.println("⚠️ Error al guardar la captura final: " + ex.getMessage());
-        } catch (Exception ignore) { }
+        }
         // Cerrar popup
         cerrarPopupResultado();
     }
 
-    // ====== Popup “Resultados”: lectura de estado y cierre robusto ======
+    // ====== Popup "Resultados": lectura de estado y cierre robusto ======
     private final By dlgResultadosBy = By.xpath(
             "//div[contains(@class,'ui-dialog')]" +
             "[.//div[contains(@class,'ui-dialog-title') and contains(normalize-space(),'Resultados')]]"
