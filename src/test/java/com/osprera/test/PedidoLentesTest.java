@@ -214,14 +214,19 @@ public class PedidoLentesTest {
         Allure.step("Creando nuevo pedido de lentes");
         
         try {
-            // Seleccionar tipo de pedido y fecha
-            pedidoLentesPage.seleccionarTipoPedidoYFecha();
-            Allure.step("Tipo de pedido 'Lentes' seleccionado y fecha configurada");
+            // Ingresar DNI del beneficiario
+            String dniBeneficiario = Vars.get("beneficiario.dni");
+            pedidoPage.completarDatosGenerales(dniBeneficiario);
+            Allure.step("DNI del beneficiario ingresado: " + dniBeneficiario);
             
             // Cargar datos del beneficiario, diagnóstico y médico
             pedidoPage.cargarDiagnosticoYCIE(Vars.get("cie.codigo"), Vars.get("diagnostico.texto"));
             pedidoPage.seleccionarMedico(Vars.get("medico.busqueda"));
             Allure.step("Datos del beneficiario, diagnóstico y médico cargados");
+            
+            // Seleccionar tipo de pedido y fecha
+            pedidoLentesPage.seleccionarTipoPedidoYFecha();
+            Allure.step("Tipo de pedido 'Lentes' seleccionado y fecha configurada");
             
         } catch (Exception e) {
             Allure.step("Error al crear nuevo pedido de lentes: " + e.getMessage());
