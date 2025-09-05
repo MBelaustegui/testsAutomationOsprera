@@ -276,12 +276,67 @@ public class PedidoPage {
         // Este método hace click en la pestaña "Pendientes" después de ingresar al módulo SGP
         // Solo se usa en producción
         try {
-            WebElement pestanaPendientes = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//li//a[@href='#/solicitudes/auditoria/consultas']//span[text()='Pendientes']")));
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", pestanaPendientes);
-            System.out.println("✅ Click realizado en pestaña 'Pendientes'");
+            System.out.println("🔍 Buscando pestaña 'Pendientes'...");
+            Thread.sleep(2000);
+            
+            // Buscar todos los elementos que contengan "Pendientes" para debug
+            var elementosPendientes = driver.findElements(By.xpath("//*[contains(text(),'Pendientes')]"));
+            System.out.println("📊 Encontrados " + elementosPendientes.size() + " elementos con texto 'Pendientes'");
+            
+            // Analizar cada elemento encontrado
+            for (int i = 0; i < elementosPendientes.size(); i++) {
+                try {
+                    WebElement elemento = elementosPendientes.get(i);
+                    String tagName = elemento.getTagName();
+                    String texto = elemento.getText();
+                    String href = elemento.getAttribute("href");
+                    boolean visible = elemento.isDisplayed();
+                    boolean habilitado = elemento.isEnabled();
+                    
+                    System.out.println("🔍 Elemento " + (i+1) + ":");
+                    System.out.println("   Tag: " + tagName);
+                    System.out.println("   Texto: '" + texto + "'");
+                    System.out.println("   Href: " + href);
+                    System.out.println("   Visible: " + visible + ", Habilitado: " + habilitado);
+                    
+                    // Buscar el elemento que sea un enlace clickeable con "Pendientes"
+                    if (texto.trim().equals("Pendientes") && visible && habilitado) {
+                        System.out.println("✅ ¡Encontrado! Elemento clickeable con 'Pendientes'");
+                        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", elemento);
+                        System.out.println("✅ Click realizado en pestaña 'Pendientes'");
+                        return;
+                    }
+                } catch (Exception e) {
+                    System.out.println("❌ Error analizando elemento " + (i+1) + ": " + e.getMessage());
+                }
+            }
+            
+            // Si no se encontró con el método anterior, intentar selectores alternativos
+            String[] selectores = {
+                "//a[contains(text(),'Pendientes')]",
+                "//li//a[contains(text(),'Pendientes')]",
+                "//span[contains(text(),'Pendientes')]",
+                "//*[@href and contains(text(),'Pendientes')]",
+                "//a[@href='#/solicitudes/auditoria/consultas']",
+                "//a[contains(@href,'auditoria') and contains(text(),'Pendientes')]"
+            };
+            
+            for (String selector : selectores) {
+                try {
+                    WebElement elemento = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(selector)));
+                    System.out.println("✅ Elemento encontrado con selector: " + selector);
+                    ((JavascriptExecutor) driver).executeScript("arguments[0].click();", elemento);
+                    System.out.println("✅ Click realizado en pestaña 'Pendientes'");
+                    return;
+                } catch (Exception e) {
+                    System.out.println("❌ Falló selector: " + selector);
+                }
+            }
+            
+            System.out.println("⚠️ No se encontró ningún elemento clickeable con 'Pendientes'");
+            
         } catch (Exception e) {
-            System.out.println("⚠️ No se pudo hacer click en pestaña 'Pendientes': " + e.getMessage());
+            System.out.println("⚠️ Error en clickPestanaPendientes: " + e.getMessage());
             // No lanzar excepción para que el test continúe
         }
     }

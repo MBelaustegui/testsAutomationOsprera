@@ -64,26 +64,75 @@ public class AuditoriaCentralTest {
         
         try {
             // Step 1: Ingresar al sistema como auditor central
+            Allure.step("🔐 PASO 1: Iniciando sesión como auditor central");
             ingresarComoAuditorCentral();
             
             // Step 2: Entrar al módulo SGP
+            Allure.step("📋 PASO 2: Accediendo al módulo SGP");
             entrarModuloSGP();
             
             // Step 3: Buscar el pedido generado
+            Allure.step("🔍 PASO 3: Buscando pedido para auditoría");
             buscarPedidoGenerado();
             
             // Step 4: Autorizar el pedido
+            Allure.step("✅ PASO 4: Autorizando pedido");
             autorizarPedido();
             
-        } catch (Exception e) {
-            // Capturar screenshot en caso de error
+            // Step 5: Capturar screenshot final
+            Allure.step("📸 PASO 5: Capturando evidencia de autorización exitosa");
             try {
                 byte[] screenshot = ((org.openqa.selenium.TakesScreenshot) driver).getScreenshotAs(org.openqa.selenium.OutputType.BYTES);
-                Allure.addAttachment("Error Screenshot", "image/png", new String(screenshot));
-            } catch (Exception screenshotException) {
-                Allure.addAttachment("Error Screenshot", "text/plain", "No se pudo capturar screenshot: " + screenshotException.getMessage());
+                io.qameta.allure.Allure.getLifecycle().addAttachment("✅ AUDITORÍA CENTRAL EXITOSA", "image/png", "png", screenshot);
+            } catch (Exception e) {
+                Allure.step("⚠️ No se pudo capturar screenshot final: " + e.getMessage());
             }
-            throw e;
+            
+            // Mensaje de éxito
+            Allure.step("🎉 AUDITORÍA CENTRAL COMPLETADA EXITOSAMENTE");
+            
+        } catch (Exception e) {
+            // Manejo detallado de errores con captura de pantalla
+            String errorMessage = "❌ FALLO EN AUDITORÍA CENTRAL: " + e.getMessage();
+            Allure.step(errorMessage);
+            
+            // Capturar screenshot del error
+            try {
+                byte[] screenshot = ((org.openqa.selenium.TakesScreenshot) driver).getScreenshotAs(org.openqa.selenium.OutputType.BYTES);
+                io.qameta.allure.Allure.getLifecycle().addAttachment("❌ ERROR - Auditoría Central Falló", "image/png", "png", screenshot);
+                
+                // Agregar información detallada del error
+                String errorDetails = String.format(
+                    "🚨 DETALLES DEL ERROR:\n" +
+                    "=====================================\n" +
+                    "❌ Test: Auditoría Central\n" +
+                    "⏰ Timestamp: %s\n" +
+                    "🌍 Ambiente: %s\n" +
+                    "👤 Usuario: %s\n" +
+                    "🔗 URL: %s\n" +
+                    "💥 Error: %s\n" +
+                    "📍 Stack Trace: %s\n" +
+                    "=====================================\n" +
+                    "🛑 EJECUCIÓN DETENIDA - Revisar logs y screenshot",
+                    java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")),
+                    com.osprera.test.utils.EnvironmentManager.getCurrentEnvironment(),
+                    com.osprera.test.utils.EnvironmentManager.getUsuarioAuditoriaCentral(),
+                    driver.getCurrentUrl(),
+                    e.getMessage(),
+                    e.getClass().getSimpleName()
+                );
+                
+                Allure.addAttachment("Error Details", "text/plain", errorDetails);
+                
+            } catch (Exception screenshotException) {
+                Allure.addAttachment("❌ Error Screenshot", "text/plain", 
+                    "No se pudo capturar screenshot: " + screenshotException.getMessage());
+            }
+            
+            // Marcar el test como fallido con mensaje claro
+            Assertions.fail("🚨 AUDITORÍA CENTRAL FALLÓ: " + e.getMessage() + 
+                          "\n📸 Revisar screenshot adjunto para más detalles" +
+                          "\n🛑 Ejecución detenida para investigación");
         }
     }
     
