@@ -117,7 +117,7 @@ public class AuditoriaProvincialTest {
                 org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable(
                     org.openqa.selenium.By.xpath("//input[@type='password']")));
             passwordInput.clear();
-            passwordInput.sendKeys(com.osprera.test.utils.EnvironmentManager.getCurrentPassword());
+            passwordInput.sendKeys(com.osprera.test.utils.EnvironmentManager.getPasswordAuditoriaProvincial());
 
             // Seleccionar tipo de usuario
             String tipoUsuario = com.osprera.test.utils.EnvironmentManager.getCurrentTipoUsuario();

@@ -10,7 +10,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.JavascriptExecutor;
 import java.time.Duration;
 import com.osprera.test.hooks.TestFailureListener;
 
@@ -107,7 +106,7 @@ public class AuditoriaCentralTest {
                 org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable(
                     org.openqa.selenium.By.xpath("//input[@type='password']")));
             passwordInput.clear();
-            passwordInput.sendKeys(com.osprera.test.utils.EnvironmentManager.getCurrentPassword());
+            passwordInput.sendKeys(com.osprera.test.utils.EnvironmentManager.getPasswordAuditoriaCentral());
 
             // Seleccionar tipo de usuario
             String tipoUsuario = com.osprera.test.utils.EnvironmentManager.getCurrentTipoUsuario();

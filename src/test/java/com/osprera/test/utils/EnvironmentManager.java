@@ -76,6 +76,34 @@ public class EnvironmentManager {
     }
     
     /**
+     * Obtiene la contraseña específica para auditoría provincial
+     */
+    public static String getPasswordAuditoriaProvincial() {
+        String ambiente = Vars.get("ambiente");
+        if (ambiente == null) ambiente = "produccion";
+        if ("qa".equals(ambiente)) {
+            return Vars.get("qa.password");
+        } else if ("produccion".equals(ambiente)) {
+            return Vars.get("produccion.password.auditoria_provincial");
+        }
+        return Vars.get(ambiente + ".password");
+    }
+    
+    /**
+     * Obtiene la contraseña específica para auditoría central
+     */
+    public static String getPasswordAuditoriaCentral() {
+        String ambiente = Vars.get("ambiente");
+        if (ambiente == null) ambiente = "produccion";
+        if ("qa".equals(ambiente)) {
+            return Vars.get("qa.password");
+        } else if ("produccion".equals(ambiente)) {
+            return Vars.get("produccion.password.auditoria_central");
+        }
+        return Vars.get(ambiente + ".password");
+    }
+    
+    /**
      * Obtiene el tipo de usuario del ambiente actual
      */
     public static String getCurrentTipoUsuario() {
@@ -120,7 +148,6 @@ public class EnvironmentManager {
      * Valida que el ambiente actual tenga todas las propiedades necesarias
      */
     public static boolean isEnvironmentValid() {
-        String ambiente = getCurrentEnvironment();
         String url = getCurrentUrl();
         String usuario = getCurrentUsuario();
         String password = getCurrentPassword();
