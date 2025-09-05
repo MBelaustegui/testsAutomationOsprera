@@ -48,8 +48,14 @@ public class AuditoriaCentralTest {
     
     @AfterAll
     static void tearDown() {
-        if (driver != null) {
-            driver.quit();
+        try {
+            if (driver != null) {
+                Allure.step("🔚 Cerrando navegador al finalizar suite de auditoría central");
+                driver.quit();
+                Allure.step("✅ Navegador cerrado exitosamente");
+            }
+        } catch (Exception e) {
+            Allure.step("⚠️ Error al cerrar navegador en tearDown: " + e.getMessage());
         }
     }
     
@@ -129,10 +135,21 @@ public class AuditoriaCentralTest {
                     "No se pudo capturar screenshot: " + screenshotException.getMessage());
             }
             
+            // Cerrar el navegador antes de fallar
+            try {
+                if (driver != null) {
+                    driver.quit();
+                    Allure.step("🔚 Navegador cerrado después del error");
+                }
+            } catch (Exception closeException) {
+                Allure.step("⚠️ Error al cerrar navegador: " + closeException.getMessage());
+            }
+            
             // Marcar el test como fallido con mensaje claro
             Assertions.fail("🚨 AUDITORÍA CENTRAL FALLÓ: " + e.getMessage() + 
                           "\n📸 Revisar screenshot adjunto para más detalles" +
-                          "\n🛑 Ejecución detenida para investigación");
+                          "\n🛑 Ejecución detenida para investigación" +
+                          "\n🔚 Navegador cerrado automáticamente");
         }
     }
     
